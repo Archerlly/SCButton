@@ -237,7 +237,17 @@
 //响应按钮点击
 -(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
     if (_isDisperse) {
-        return YES;
+//        NSLog(@"%@",NSStringFromCGPoint(point));
+        //辨别
+        if (CGRectContainsPoint(_folder.frame, point)) {
+            return YES;
+        }
+        for (UIButton *btn in _btns) {
+            if (CGRectContainsPoint(btn.frame, point)) {
+                return YES;
+            }
+        }
+        return NO;
     }else{
         return [super pointInside:point withEvent:event];
     }
