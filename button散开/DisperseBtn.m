@@ -18,6 +18,7 @@
 
 @property (nonatomic ,weak)UIImageView *folder;
 @property (nonatomic, assign) BOOL isOn;
+@property (assign, nonatomic) BOOL isDisperse;
 
 @end
 
@@ -63,7 +64,10 @@
 }
 
 -(void)tap:(UITapGestureRecognizer *)sender{
-    [self disperse];
+    
+    self.isDisperse ? [self changeFrameWithPoint:self.center] : [self disperse];
+    
+//    [self disperse];
 }
 
 //存在误操作bug
@@ -74,6 +78,8 @@
 //}
 
 -(void)disperse{
+    
+    _isDisperse = YES;
     
     CGFloat startAngle = 0.0;
     CGFloat angle = 2 * M_PI / _btns.count;
@@ -108,7 +114,8 @@
         
         //弹簧效果
        [UIView animateWithDuration:0.5 delay:0.1*i usingSpringWithDamping:0.5 initialSpringVelocity:0 options:UIViewAnimationOptionCurveLinear animations:^{
-            btn.transform = CGAffineTransformIsIdentity(btn.transform) ? CGAffineTransformMakeTranslation(x, y) : CGAffineTransformIdentity;
+//            btn.transform = CGAffineTransformIsIdentity(btn.transform) ? CGAffineTransformMakeTranslation(x, y) : CGAffineTransformIdentity;
+           btn.transform = CGAffineTransformMakeTranslation(x, y);
         } completion:nil];
     }
 }
@@ -151,6 +158,8 @@
 }
 
 -(void)changeFrameWithPoint:(CGPoint)point{
+    
+    _isDisperse = NO;
     
     self.center = point;
     
@@ -223,7 +232,16 @@
     }
 
     return @{@"start":[NSNumber numberWithFloat:startAngle],@"end":[NSNumber numberWithFloat:endAngle]};
-    
 }
+
+//响应按钮点击
+-(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
+    if (_isDisperse) {
+        return YES;
+    }else{
+        return [super pointInside:point withEvent:event];
+    }
+}
+
 
 @end
