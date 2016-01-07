@@ -52,9 +52,10 @@
     
     [self addSubview:imgView];
     
-    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(longPress:)];
-    longPress.minimumPressDuration = 1;
-    [imgView addGestureRecognizer:longPress];
+    //取消长按唤出
+//    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(longPress:)];
+//    longPress.minimumPressDuration = 0.25;
+//    [imgView addGestureRecognizer:longPress];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tap:)];
     tap.numberOfTapsRequired = 2;
@@ -62,15 +63,15 @@
 }
 
 -(void)tap:(UITapGestureRecognizer *)sender{
-//    NSLog(@"123");
     [self disperse];
 }
 
--(void)longPress:(UILongPressGestureRecognizer *)sender{
-    if (sender.state == UIGestureRecognizerStateBegan) {
-//        NSLog(@"12");
-    }
-}
+//存在误操作bug
+//-(void)longPress:(UILongPressGestureRecognizer *)sender{
+//    if (sender.state == UIGestureRecognizerStateBegan) {
+//        [self disperse];
+//    }
+//}
 
 -(void)disperse{
     
@@ -91,16 +92,22 @@
         
         angle = (end - start) / _btns.count;
         startAngle = start + angle * 0.5;
-        NSLog(@"angle:%.2f",angle * 180 / M_PI);
-        NSLog(@"startAngle:%.2f",startAngle * 180 / M_PI);
-        NSLog(@"rad:%.2f",rad);
+//        NSLog(@"angle:%.2f",angle * 180 / M_PI);
+//        NSLog(@"startAngle:%.2f",startAngle * 180 / M_PI);
+//        NSLog(@"rad:%.2f",rad);
     }
 
     for (int i = 0; i< _btns.count; i++) {
         CGFloat x = rad * cos(angle * i + startAngle);
         CGFloat y = rad * sin(angle * i + startAngle);
         UIButton *btn = _btns[i];
-        [UIView animateWithDuration:0.05 delay:0.05*i options:UIViewAnimationOptionCurveLinear animations:^{
+        //初始效果
+//        [UIView animateWithDuration:0.05 delay:0.05*i options:UIViewAnimationOptionCurveLinear animations:^{
+//            btn.transform = CGAffineTransformIsIdentity(btn.transform) ? CGAffineTransformMakeTranslation(x, y) : CGAffineTransformIdentity;
+//        } completion:nil];
+        
+        //弹簧效果
+       [UIView animateWithDuration:0.5 delay:0.1*i usingSpringWithDamping:0.5 initialSpringVelocity:0 options:UIViewAnimationOptionCurveLinear animations:^{
             btn.transform = CGAffineTransformIsIdentity(btn.transform) ? CGAffineTransformMakeTranslation(x, y) : CGAffineTransformIdentity;
         } completion:nil];
     }
@@ -121,7 +128,7 @@
         CGRect oringinaRect = CGRectMake(self.center.x - rad - kButtonW*0.5, self.center.y - rad - kButtonW*0.5, 2*rad + kButtonW, 2*rad + kButtonW);
         //相交范围
         CGRect intertRect = CGRectIntersection(oringinaRect, self.borderRect);
-        NSLog(@"%@",NSStringFromCGRect(intertRect));
+//        NSLog(@"%@",NSStringFromCGRect(intertRect));
         //递归
         return [self adaptableAngelWithRect:intertRect Radius:rad];
     }else{
