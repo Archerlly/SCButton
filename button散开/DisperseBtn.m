@@ -15,6 +15,7 @@
 //最小半径
 #define kMinRadius 50
 #define kButtonW 50
+#define kAnimationDuration 0.4
 
 @interface DisperseBtn ()
 
@@ -48,7 +49,7 @@
     
     UIImageView *imgView = [UIImageView new];
     _folder = imgView;
-    imgView.image = (self.image==nil) ? [UIImage imageNamed:@"SC"] : self.image;
+    imgView.image = self.closeImage;
     imgView.bounds = self.bounds;
     imgView.center = kCenter;
     imgView.userInteractionEnabled = YES;
@@ -82,8 +83,9 @@
 -(void)disperse{
     
     _isDisperse = YES;
+    _folder.image = self.openImage;
     
-    CGFloat startAngle = 0.0;
+    CGFloat startAngle = -M_PI_2;
     CGFloat angle = 2 * M_PI / _btns.count;
     CGFloat rad = kSpace / angle;
     
@@ -106,9 +108,11 @@
     rad = rad > kMinRadius ? rad : kMinRadius;
 
     for (int i = 0; i< _btns.count; i++) {
+        
         CGFloat x = rad * cos(angle * i + startAngle);
         CGFloat y = rad * sin(angle * i + startAngle);
         UIButton *btn = _btns[i];
+        
         //初始效果
 //        [UIView animateWithDuration:0.05 delay:0.05*i options:UIViewAnimationOptionCurveLinear animations:^{
 //            btn.transform = CGAffineTransformIsIdentity(btn.transform) ? CGAffineTransformMakeTranslation(x, y) : CGAffineTransformIdentity;
@@ -117,6 +121,7 @@
         //弹簧效果
        [UIView animateWithDuration:0.5 delay:0.1*i usingSpringWithDamping:0.5 initialSpringVelocity:0 options:UIViewAnimationOptionCurveLinear animations:^{
            btn.transform = CGAffineTransformMakeTranslation(x, y);
+           
         } completion:nil];
     }
 }
@@ -158,15 +163,30 @@
 
 -(void)changeFrameWithPoint:(CGPoint)point{
     
-    _isDisperse = NO;
-    
     self.center = point;
+    
+    //没展开就返回
+    if (!_isDisperse) {
+        return;
+    }
+    
+    _isDisperse = NO;
+    _folder.image = self.closeImage;
     
     for (int i = 0; i< _btns.count; i++) {
         UIButton *btn = _btns[i];
-        [UIView animateWithDuration:0.05 delay:0.05*i options:UIViewAnimationOptionCurveLinear animations:^{
-            btn.transform = CGAffineTransformIdentity;
-        } completion:nil];
+        
+//        [UIView animateWithDuration:0.05 delay:0.05*i options:UIViewAnimationOptionCurveLinear animations:^{
+//            btn.transform = CGAffineTransformIdentity;
+//        } completion:nil];
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05*i * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            CGPoint p = [self.superview convertPoint:point toView:btn];
+//            NSLog(@"%@",NSStringFromCGPoint(point));
+//            NSLog(@"%@",NSStringFromCGPoint(p));
+            [self animationWithBtn:btn Point:p];
+            NSLog(@"%d",i);
+        });
     }
     
 }
@@ -246,5 +266,37 @@
     }
 }
 
+
+-(void)animationWithBtn:(UIButton*)btn Point:(CGPoint)point{
+    
+    CABasicAnimation *rotation = [CABasicAnimation new];
+    rotation.keyPath = @"transform.rotation";
+    rotation.toValue = @(5 * M_PI);
+//    rotation.duration = 2;
+//    rotation.removedOnCompletion = NO;
+//    rotation.fillMode = @"forwards";
+    
+    CABasicAnimation *trans = [CABasicAnimation new];
+    trans.keyPath = @"transform";
+    trans.toValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
+    trans.beginTime = 0.2;
+    trans.duration = kAnimationDuration - trans.beginTime;
+//    trans.removedOnCompletion = NO;
+//    trans.fillMode = @"forwards";
+    
+    CAAnimationGroup *group = [CAAnimationGroup new];
+    group.animations = @[rotation,trans];
+    group.duration = kAnimationDuration;
+    group.removedOnCompletion = NO;
+    group.fillMode = @"forwards";
+    
+    [btn.layer addAnimation:group forKey:nil];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(group.duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        btn.transform = CGAffineTransformIdentity;
+        [btn.layer removeAllAnimations];
+//        NSLog(@"aaa");
+    });
+}
 
 @end

@@ -11,6 +11,7 @@
 @interface DisperseBtn : UIView
 //边界
 @property (assign, nonatomic) CGRect borderRect;
-@property (strong, nonatomic) UIImage *image;
+@property (strong, nonatomic) UIImage *closeImage;
+@property (strong, nonatomic) UIImage *openImage;
 @property (nonatomic ,copy)NSArray *btns;
 @end

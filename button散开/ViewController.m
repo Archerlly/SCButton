@@ -22,10 +22,11 @@
     DisperseBtn *disView = [[DisperseBtn alloc]init];
     disView.frame = CGRectMake(100, 100, 50, 50);
     disView.borderRect = self.view.frame;
-    
+    disView.closeImage = [UIImage imageNamed:@"icon2"];
+    disView.openImage = [UIImage imageNamed:@"icon3"];
     
     NSMutableArray *marr = [NSMutableArray array];
-    for (int i = 0; i< 3; i++) {
+    for (int i = 0; i< 5; i++) {
         UIButton *btn = [UIButton new];
         NSString *name = [NSString stringWithFormat:@"SC%d",i];
         [btn setBackgroundImage:[UIImage imageNamed:name] forState:UIControlStateNormal];
