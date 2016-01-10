@@ -25,9 +25,9 @@
     
     
     NSMutableArray *marr = [NSMutableArray array];
-    for (int i = 0; i< 8; i++) {
+    for (int i = 0; i< 3; i++) {
         UIButton *btn = [UIButton new];
-        NSString *name = [NSString stringWithFormat:@"found_icons_%d",i];
+        NSString *name = [NSString stringWithFormat:@"SC%d",i];
         [btn setBackgroundImage:[UIImage imageNamed:name] forState:UIControlStateNormal];
         [marr addObject:btn];
         btn.tag = i;

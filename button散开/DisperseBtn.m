@@ -12,6 +12,8 @@
 #define kSpace 50
 //适配半径时的增长量
 #define kRadiusStep 10
+//最小半径
+#define kMinRadius 50
 #define kButtonW 50
 
 @interface DisperseBtn ()
@@ -46,7 +48,7 @@
     
     UIImageView *imgView = [UIImageView new];
     _folder = imgView;
-    imgView.image = (self.image==nil) ? [UIImage imageNamed:@"folder"] : self.image;
+    imgView.image = (self.image==nil) ? [UIImage imageNamed:@"SC"] : self.image;
     imgView.bounds = self.bounds;
     imgView.center = kCenter;
     imgView.userInteractionEnabled = YES;
@@ -98,10 +100,10 @@
         
         angle = (end - start) / _btns.count;
         startAngle = start + angle * 0.5;
-//        NSLog(@"angle:%.2f",angle * 180 / M_PI);
-//        NSLog(@"startAngle:%.2f",startAngle * 180 / M_PI);
-//        NSLog(@"rad:%.2f",rad);
     }
+    
+    //过滤过小半径
+    rad = rad > kMinRadius ? rad : kMinRadius;
 
     for (int i = 0; i< _btns.count; i++) {
         CGFloat x = rad * cos(angle * i + startAngle);
@@ -114,7 +116,6 @@
         
         //弹簧效果
        [UIView animateWithDuration:0.5 delay:0.1*i usingSpringWithDamping:0.5 initialSpringVelocity:0 options:UIViewAnimationOptionCurveLinear animations:^{
-//            btn.transform = CGAffineTransformIsIdentity(btn.transform) ? CGAffineTransformMakeTranslation(x, y) : CGAffineTransformIdentity;
            btn.transform = CGAffineTransformMakeTranslation(x, y);
         } completion:nil];
     }
@@ -127,7 +128,6 @@
     
     CGFloat startAngle = [dict[@"start"] floatValue];
     CGFloat endAngle = [dict[@"end"] floatValue];
-//    NSLog(@"%.2f  %.2f",startAngle * 180 / M_PI,endAngle * 180 / M_PI);
     
     if ((endAngle - startAngle) * rad < _btns.count * kSpace) {
         
@@ -135,7 +135,7 @@
         CGRect oringinaRect = CGRectMake(self.center.x - rad - kButtonW*0.5, self.center.y - rad - kButtonW*0.5, 2*rad + kButtonW, 2*rad + kButtonW);
         //相交范围
         CGRect intertRect = CGRectIntersection(oringinaRect, self.borderRect);
-//        NSLog(@"%@",NSStringFromCGRect(intertRect));
+
         //递归
         return [self adaptableAngelWithRect:intertRect Radius:rad];
     }else{
@@ -146,7 +146,7 @@
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     CGPoint p = [[touches anyObject]locationInView:nil];
     _isOn = CGRectContainsPoint(self.frame, p);
-//    NSLog(@"%@",NSStringFromCGPoint(p));
+
 }
 
 -(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
@@ -154,7 +154,6 @@
     if (_isOn) {
         [self changeFrameWithPoint:p];
     }
-//    NSLog(@"%@",NSStringFromCGPoint(p));
 }
 
 -(void)changeFrameWithPoint:(CGPoint)point{
@@ -192,8 +191,6 @@
     CGFloat step = M_PI * 0.01;
     NSInteger count = 4 * M_PI / step;
     
-//    NSLog(@"交界%@,%.2f,%@",NSStringFromCGRect(rect),rad,NSStringFromCGPoint(centre));
-    
     //找到所有连续的圆弧
     for (int i = 0; i<= count; i++, angle += step) {
         
@@ -201,18 +198,15 @@
         CGFloat y = rad * sin(angle) + centre.y;
         CGPoint point = CGPointMake(x, y);
         
-//        NSLog(@"%@",NSStringFromCGPoint(point));
         //进边界
         if (!CGRectContainsPoint(rect, lastPoint) && CGRectContainsPoint(rect, point)) {
             startAngle = angle;
-//            NSLog(@"startAngle:%.2f",startAngle * 180 / M_PI);
         }
         //出边界
         if (CGRectContainsPoint(rect, lastPoint) && !CGRectContainsPoint(rect, point)) {
             endAngle = angle;
             [marr addObject:[NSNumber numberWithFloat:startAngle]];
             [marr addObject:[NSNumber numberWithFloat:endAngle]];
-//            NSLog(@"endAngle:%.2f",endAngle * 180 / M_PI);
         }
         lastPoint = point;
     }
@@ -237,7 +231,6 @@
 //响应按钮点击
 -(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
     if (_isDisperse) {
-//        NSLog(@"%@",NSStringFromCGPoint(point));
         //辨别
         if (CGRectContainsPoint(_folder.frame, point)) {
             return YES;
