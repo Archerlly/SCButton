@@ -16,13 +16,14 @@
 #define kMinRadius 50
 #define kButtonW 50
 #define kAnimationDuration 0.4
+#define kAnimationDelay 0.1
 
 @interface DisperseBtn ()
 
 @property (nonatomic ,weak)UIImageView *folder;
 @property (nonatomic, assign) BOOL isOn;
 @property (assign, nonatomic) BOOL isDisperse;
-
+@property (assign, nonatomic) BOOL isAnimation;
 @end
 
 @implementation DisperseBtn
@@ -44,9 +45,6 @@
     
     [super didMoveToSuperview];
     
-//    NSLog(@"%@",NSStringFromCGRect(self.frame));
-//    NSLog(@"%@",NSStringFromCGRect(self.borderRect));
-    
     UIImageView *imgView = [UIImageView new];
     _folder = imgView;
     imgView.image = self.closeImage;
@@ -56,11 +54,6 @@
     
     [self addSubview:imgView];
     
-    //取消长按唤出
-//    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(longPress:)];
-//    longPress.minimumPressDuration = 0.25;
-//    [imgView addGestureRecognizer:longPress];
-    
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tap:)];
     tap.numberOfTapsRequired = 2;
     [imgView addGestureRecognizer:tap];
@@ -69,19 +62,16 @@
 -(void)tap:(UITapGestureRecognizer *)sender{
     
     self.isDisperse ? [self changeFrameWithPoint:self.center] : [self disperse];
-    
-//    [self disperse];
 }
 
-//存在误操作bug
-//-(void)longPress:(UILongPressGestureRecognizer *)sender{
-//    if (sender.state == UIGestureRecognizerStateBegan) {
-//        [self disperse];
-//    }
-//}
 
 -(void)disperse{
+
+    if (_isAnimation) {
+        return;
+    }
     
+    _isAnimation = YES;
     _isDisperse = YES;
     _folder.image = self.openImage;
     
@@ -113,17 +103,16 @@
         CGFloat y = rad * sin(angle * i + startAngle);
         UIButton *btn = _btns[i];
         
-        //初始效果
-//        [UIView animateWithDuration:0.05 delay:0.05*i options:UIViewAnimationOptionCurveLinear animations:^{
-//            btn.transform = CGAffineTransformIsIdentity(btn.transform) ? CGAffineTransformMakeTranslation(x, y) : CGAffineTransformIdentity;
-//        } completion:nil];
-        
         //弹簧效果
-       [UIView animateWithDuration:0.5 delay:0.1*i usingSpringWithDamping:0.5 initialSpringVelocity:0 options:UIViewAnimationOptionCurveLinear animations:^{
+       [UIView animateWithDuration:kAnimationDuration delay:kAnimationDelay*i usingSpringWithDamping:0.5 initialSpringVelocity:0 options:UIViewAnimationOptionCurveLinear animations:^{
            btn.transform = CGAffineTransformMakeTranslation(x, y);
            
         } completion:nil];
     }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)((kAnimationDelay * self.btns.count + kAnimationDuration) * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        _isAnimation = NO;
+    });
 }
 
 //找到合适的角度
@@ -161,42 +150,44 @@
     }
 }
 
+//对外接口
+-(void)recoverBotton{
+    [self changeFrameWithPoint:self.center];
+}
+
 -(void)changeFrameWithPoint:(CGPoint)point{
     
     self.center = point;
+    
+    if (_isAnimation) {
+        return;
+    }
     
     //没展开就返回
     if (!_isDisperse) {
         return;
     }
     
+    _isAnimation = YES;
     _isDisperse = NO;
     _folder.image = self.closeImage;
     
     for (int i = 0; i< _btns.count; i++) {
         UIButton *btn = _btns[i];
-        
-//        [UIView animateWithDuration:0.05 delay:0.05*i options:UIViewAnimationOptionCurveLinear animations:^{
-//            btn.transform = CGAffineTransformIdentity;
-//        } completion:nil];
 
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05*i * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kAnimationDelay*i * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             CGPoint p = [self.superview convertPoint:point toView:btn];
-//            NSLog(@"%@",NSStringFromCGPoint(point));
-//            NSLog(@"%@",NSStringFromCGPoint(p));
             [self animationWithBtn:btn Point:p];
-            NSLog(@"%d",i);
         });
     }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)((kAnimationDelay * self.btns.count + kAnimationDuration) * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        _isAnimation = NO;
+    });
     
 }
 
 -(NSDictionary *)getMaxMinAngleWithRect:(CGRect)rect Radius:(CGFloat)rad{
-    
-//    UIView *v = [[UIView alloc]initWithFrame:rect];
-//    v.backgroundColor = [UIColor redColor];
-//    [self.superview addSubview:v];
-//    [self.superview  sendSubviewToBack:v];
     
     CGFloat angle = 0;
     CGFloat startAngle = 0;
@@ -272,18 +263,13 @@
     CABasicAnimation *rotation = [CABasicAnimation new];
     rotation.keyPath = @"transform.rotation";
     rotation.toValue = @(5 * M_PI);
-//    rotation.duration = 2;
-//    rotation.removedOnCompletion = NO;
-//    rotation.fillMode = @"forwards";
     
     CABasicAnimation *trans = [CABasicAnimation new];
     trans.keyPath = @"transform";
     trans.toValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
     trans.beginTime = 0.2;
     trans.duration = kAnimationDuration - trans.beginTime;
-//    trans.removedOnCompletion = NO;
-//    trans.fillMode = @"forwards";
-    
+
     CAAnimationGroup *group = [CAAnimationGroup new];
     group.animations = @[rotation,trans];
     group.duration = kAnimationDuration;
@@ -295,7 +281,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(group.duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         btn.transform = CGAffineTransformIdentity;
         [btn.layer removeAllAnimations];
-//        NSLog(@"aaa");
+
     });
 }
 

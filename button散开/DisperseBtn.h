@@ -14,4 +14,6 @@
 @property (strong, nonatomic) UIImage *closeImage;
 @property (strong, nonatomic) UIImage *openImage;
 @property (nonatomic ,copy)NSArray *btns;
+//回收按钮
+-(void)recoverBotton;
 @end
