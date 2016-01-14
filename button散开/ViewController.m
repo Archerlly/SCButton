@@ -18,10 +18,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    //散开的view
+    //实例化对象
     DisperseBtn *disView = [[DisperseBtn alloc]init];
     disView.frame = CGRectMake(100, 100, 50, 50);
+    //设置适应的边界
     disView.borderRect = self.view.frame;
+    //设置两个状态对应的图片
     disView.closeImage = [UIImage imageNamed:@"icon2"];
     disView.openImage = [UIImage imageNamed:@"icon3"];
     [self.view addSubview:disView];

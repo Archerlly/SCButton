@@ -7,16 +7,18 @@
 //
 
 #import "DisperseBtn.h"
-#define kCenter CGPointMake(self.bounds.size.width * 0.5, self.bounds.size.height * 0.5)
 //两个按钮间的圆弧距离
 #define kSpace 50
-//适配半径时的增长量
+//适配半径时的增长量（可以提高精度）
 #define kRadiusStep 10
 //最小半径
 #define kMinRadius 50
-#define kButtonW 50
+//动画时常
 #define kAnimationDuration 0.4
+//延时时常
 #define kAnimationDelay 0.1
+#define kCenter CGPointMake(self.bounds.size.width * 0.5, self.bounds.size.height * 0.5)
+#define kButtonW 50
 
 @interface DisperseBtn ()
 
