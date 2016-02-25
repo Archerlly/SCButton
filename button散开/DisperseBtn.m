@@ -146,9 +146,13 @@
 }
 
 -(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    CGPoint p = [[touches anyObject]locationInView:nil];
+    CGPoint p = [[touches anyObject]locationInView:self.superview];
     if (_isOn) {
-        [self changeFrameWithPoint:p];
+        CGRect inseterRect = CGRectInset(self.borderRect, self.bounds.size.width * 0.5, self.bounds.size.height * 0.5);
+        if (CGRectContainsPoint(inseterRect, p)) {
+
+            [self changeFrameWithPoint:p];
+        }
     }
 }
 
