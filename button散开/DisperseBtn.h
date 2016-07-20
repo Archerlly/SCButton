@@ -18,4 +18,6 @@
 @property (nonatomic ,copy)NSArray *btns;
 //回收按钮
 -(void)recoverBotton;
+//散开按钮
+-(void)disperse;
 @end

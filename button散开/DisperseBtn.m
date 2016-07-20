@@ -150,8 +150,9 @@
     if (_isOn) {
         CGRect inseterRect = CGRectInset(self.borderRect, self.bounds.size.width * 0.5, self.bounds.size.height * 0.5);
         if (CGRectContainsPoint(inseterRect, p)) {
-
             [self changeFrameWithPoint:p];
+        }else{
+            _isOn = NO;
         }
     }
 }
