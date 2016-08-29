@@ -1,0 +1,14 @@
+PODS:
+  - SCButton (0.1.0)
+
+DEPENDENCIES:
+  - SCButton (from `../`)
+
+EXTERNAL SOURCES:
+  SCButton:
+    :path: ../
+
+SPEC CHECKSUMS:
+  SCButton: e52fbfb02daf83298c2d8c4e1dd9acdac729a26b
+
+COCOAPODS: 0.39.0

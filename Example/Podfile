@@ -3,9 +3,5 @@ use_frameworks!
 target 'SCButton_Example' do
   pod 'SCButton', :path => '../'
 
-  target 'SCButton_Tests' do
-    inherit! :search_paths
 
-    
-  end
 end
