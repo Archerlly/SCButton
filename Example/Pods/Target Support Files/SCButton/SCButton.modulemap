@@ -1,6 +1,0 @@
-framework module SCButton {
-  umbrella header "SCButton-umbrella.h"
-
-  export *
-  module * { export * }
-}
