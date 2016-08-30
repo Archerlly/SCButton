@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
                         a useful tool button sytle
                        DESC
 
-  s.homepage         = 'https://github.com/<GITHUB_USERNAME>/SCButton'
+  s.homepage         = 'https://github.com/tt3tt3tt/SCButton.git'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { '刘成清' => 'liuchengqing@iyunxiao.com' }
