@@ -9,6 +9,6 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  SCButton: e52fbfb02daf83298c2d8c4e1dd9acdac729a26b
+  SCButton: 98d2a06331195374597e24eea2136e6bb2d6c7a1
 
 COCOAPODS: 0.39.0
